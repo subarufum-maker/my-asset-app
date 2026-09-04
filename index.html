@@ -1,0 +1,538 @@
+<!-- ... existing code ... -->
+        <!-- サマリーカード群 -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100 border-start border-4 border-primary">
+                    <span class="text-secondary fw-bold small">純資産総額 (Net Worth)</span>
+                    <h2 id="total-asset-display" class="my-2 fw-bold text-body privacy-mask">¥0</h2>
+                    <div class="small fw-bold text-primary-emphasis mb-1" id="total-breakdown-display">内訳: 💴現金 ¥0 | 📈投資 ¥0 | 💳負債 -¥0</div>
+                    <div class="small text-secondary" id="total-cost-display">投資元本: ¥0 | 評価益: +¥0</div>
+                </div>
+            </div>
+            <!-- TOP3 第1位：配当＋優待の実質総合利回りサマリー -->
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100 border-start border-4 border-warning">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary fw-bold small">年間配当＆優待 (インカム総額)</span>
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" id="total-income-yield-badge">総合利回り: 0.00%</span>
+                    </div>
+                    <h2 id="annual-dividend" class="my-2 fw-bold text-warning privacy-mask">¥0 / 年</h2>
+                    <div class="d-flex justify-content-between small text-secondary flex-wrap gap-1">
+                        <span id="monthly-dividend" class="privacy-mask">月換算: 約 ¥0</span>
+                        <span id="perk-breakdown-display" class="text-pink fw-bold">🎁 優待換算: ¥0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100 border-start border-4 border-success">
+                    <span class="text-secondary fw-bold small">新NISA枠利用状況 (投資元本)</span>
+                    <h2 id="nisa-total-display" class="my-2 fw-bold text-success privacy-mask">¥0</h2>
+                    <div class="small text-secondary" id="nisa-progress-text">上限1,800万円中 0.0% 消化</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🏅 資産マイルストーン・トロフィールーム（アチーブメント達成バッジ） -->
+        <div class="card-custom p-4 border-start border-4 border-warning mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                    <h5 class="m-0 fw-bold"><i class="bi bi-trophy-fill text-warning me-2"></i>資産マイルストーン・トロフィールーム</h5>
+                    <small class="text-secondary">資産規模・不労所得・NISA枠の節目をクリアしてトロフィーを解放しよう！</small>
+                </div>
+                <span class="badge bg-warning text-dark fw-bold px-3 py-1.5 rounded-pill" id="trophy-unlocked-count">0 / 12 解放</span>
+            </div>
+            <div class="row g-2" id="trophy-grid-container"></div>
+        </div>
+
+        <!-- ⚖️ 理想比率リバランスナビ ＆ 🏖️ サイドFIRE・配当雪だるまメーター -->
+        <div class="row g-3 mb-4">
+            <!-- ⚖️ リバランス買い増しナビ -->
+            <div class="col-lg-6">
+                <div class="card-custom p-4 h-100 border-start border-4 border-primary">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                        <div>
+                            <h5 class="m-0 fw-bold"><i class="bi bi-compass-fill text-primary me-2"></i>理想比率 買い増しナビ</h5>
+                            <small class="text-secondary">目標バランスに近づけるための今月の買い増し指示</small>
+                        </div>
+                        <button type="button" class="btn btn-xs btn-outline-primary" onclick="toggleAllocSetting()"><i class="bi bi-sliders"></i> 目標比率を設定</button>
+                    </div>
+
+                    <!-- 比率設定フォーム（初期非表示） -->
+                    <div id="alloc-setting-box" class="hidden p-3 mb-3 bg-body-tertiary rounded-3 border">
+                        <span class="small fw-bold text-secondary d-block mb-2">理想ポートフォリオ比率 (%)</span>
+                        <div class="row g-2 mb-2">
+                            <div class="col-4"><label class="small text-secondary">投信 (%)</label><input type="number" id="alloc-target-trust" class="form-control form-control-sm fw-bold" value="60"></div>
+                            <div class="col-4"><label class="small text-secondary">株式 (%)</label><input type="number" id="alloc-target-stock" class="form-control form-control-sm fw-bold" value="20"></div>
+                            <div class="col-4"><label class="small text-secondary">現金 (%)</label><input type="number" id="alloc-target-cash" class="form-control form-control-sm fw-bold" value="20"></div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary w-100 fw-bold" onclick="saveTargetAllocations()">比率を保存</button>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small fw-bold text-secondary mb-1">今月の追加投資予算 (円)</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-body-secondary fw-bold">¥</span>
+                            <input type="number" id="rebalance-budget-input" class="form-control fw-bold fs-6" value="50000" step="10000" oninput="calculateRebalanceNav()">
+                        </div>
+                    </div>
+
+                    <div id="rebalance-recommendation-box" class="p-3 bg-body-tertiary rounded-3 border"></div>
+                </div>
+            </div>
+
+            <!-- 🏖️ サイドFIRE必要労働 ＆ ⛄ 配当雪だるま -->
+            <div class="col-lg-6">
+                <div class="card-custom p-4 h-100 border-start border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                        <div>
+                            <h5 class="m-0 fw-bold"><i class="bi bi-cup-hot-fill text-success me-2"></i>サイドFIRE ＆ 配当雪だるま</h5>
+                            <small class="text-secondary">不労所得でカバーできる生活費と自動再投資の威力</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="small fw-bold text-secondary mb-0">月間目標生活費 (円)</label>
+                            <span class="badge bg-secondary-subtle text-secondary" id="sidefire-coverage-badge">不労所得カバー率: 0%</span>
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-body-secondary fw-bold">¥</span>
+                            <input type="number" id="sidefire-expense-input" class="form-control fw-bold fs-6" value="200000" step="10000" oninput="updateSideFireSnowball()">
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-success bg-opacity-10 rounded-3 border border-success-subtle mb-3">
+                        <span class="small text-secondary d-block">サイドFIREに必要な毎月の労働収入 (アルバイト・副業):</span>
+                        <h4 class="mb-1 fw-bold text-success privacy-mask" id="sidefire-needed-labor">月 約 ¥0</h4>
+                        <small class="text-success-emphasis" id="sidefire-desc">4%取崩し ＋ 配当金 ＋ 年金で大部分をカバー！</small>
+                    </div>
+
+                    <!-- ⛄ 配当再投資雪だるま自走メーター -->
+                    <div class="p-3 bg-warning bg-opacity-10 rounded-3 border border-warning-subtle">
+                        <span class="small text-secondary d-block"><i class="bi bi-snow2 text-warning me-1"></i>配当雪だるまの自走エンジン速度:</span>
+                        <div class="fw-bold text-dark mt-1" id="snowball-power-text">年間配当だけで、毎月オルカンを約 <strong>0口</strong> 自動買い増し中！</div>
+                        <small class="text-muted">（労働に頼らず不労所得が勝手に次の資産を買い集めています）</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🎛️ 動的シミュレーション・コントロールパネル（TOP3 第2位：公的年金ハイブリッド追加） -->
+<!-- ... existing code ... -->
+                                <div class="col-6"><label class="form-label small fw-bold text-secondary">年間優待想定価値 (円)</label><input type="number" id="asset-perk-val" class="form-control" placeholder="例: 3000 (クオカード等)"></div>
+                            </div>
+
+                            <!-- 📝 購入動機 ＆ マイルール（売却基準）メモ -->
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-primary"><i class="bi bi-journal-bookmark-fill me-1"></i> 購入動機 ＆ 売却マイルール（暴落対策）</label>
+                                <input type="text" id="asset-memo-rule" class="form-control" placeholder="例: 財務健全な高配当株。増配が続く限りガチホ、減配したら即売却。">
+                            </div>
+
+                            <!-- 優待内容メモ -->
+                            <div class="mb-3" id="group-perk-memo">
+<!-- ... existing code ... -->
+                                        ${hasPerk ? `<span class="text-danger fw-bold ms-1">/ 年${formatCurrency(it.perkVal)}</span>` : ''}
+                                    </div>
+                                </div>
+
+                                ${it.memoRule ? `
+                                <div class="p-2.5 mb-2.5 bg-primary bg-opacity-10 border border-primary-subtle rounded-3 text-start small">
+                                    <strong class="text-primary"><i class="bi bi-shield-check me-1"></i>投資方針・売却ルール:</strong> ${it.memoRule}
+                                </div>` : ''}
+
+                                <!-- TOP3 第1位：元本回収率メーター（恩株化チェッカー） -->
+<!-- ... existing code ... -->
+        let items = [];
+        let historyData = [];
+        let perkTasks = [];
+        let targetAlloc = { trust: 60, stock: 20, cash: 20 };
+        let currentFilter = 'all';
+        let expandedRowId = null;
+        let historyChartInstance = null;
+        let dividendMonthChartInstance = null;
+        let regionExposureChartInstance = null;
+        let assetModal, monthlyAutoSaveModal, backupModal, importModal, perkTaskModal, recordHistoryModal, addIncomeModal;
+        let parsedImportItems = [];
+<!-- ... existing code ... -->
+        function loadLocalData() {
+            try { items = JSON.parse(localStorage.getItem('local_assets_data')) || []; } catch(e) { items = []; }
+            try { historyData = JSON.parse(localStorage.getItem('local_history_data')) || []; } catch(e) { historyData = []; }
+            try { perkTasks = JSON.parse(localStorage.getItem('local_perk_tasks')) || []; } catch(e) { perkTasks = []; }
+            try { targetAlloc = JSON.parse(localStorage.getItem('app_target_alloc')) || { trust: 60, stock: 20, cash: 20 }; } catch(e) { targetAlloc = { trust: 60, stock: 20, cash: 20 }; }
+            updateAllUI();
+        }
+
+        function saveLocalData() {
+            localStorage.setItem('local_assets_data', JSON.stringify(items));
+            localStorage.setItem('local_perk_tasks', JSON.stringify(perkTasks));
+            localStorage.setItem('app_target_alloc', JSON.stringify(targetAlloc));
+            updateAllUI();
+            saveToCloud();
+        }
+
+        function updateAllUI() {
+            try {
+                let totalAssets = 0, totalDebts = 0, totalCash = 0, investmentCost = 0, investmentTotal = 0, annualDiv = 0, annualPerk = 0, nisaTotal = 0;
+
+                items.forEach(it => {
+                    const total = calculateItemTotal(it);
+                    const cost = calculateItemCost(it);
+                    
+                    if (isDebt(it)) {
+                        totalDebts += total;
+                    } else {
+                        totalAssets += total;
+                        if (isCash(it)) {
+                            totalCash += total;
+                        } else if (isInvestment(it)) {
+                            investmentTotal += total;
+                            investmentCost += cost;
+                        }
+                        if (it.nisa === 'tsumitate' || it.nisa === 'growth') nisaTotal += cost;
+                        
+                        // 配当
+                        const divYield = getNum(it.dividendYield);
+                        if (divYield > 0) annualDiv += total * (divYield / 100);
+
+                        // 優待
+                        const pVal = getNum(it.perkVal);
+                        if (pVal > 0) annualPerk += pVal;
+                    }
+                });
+
+                const netWorth = totalAssets - totalDebts;
+                const investmentProfit = investmentTotal - investmentCost;
+
+                document.getElementById('total-asset-display').textContent = formatCurrency(netWorth);
+                document.getElementById('total-breakdown-display').innerHTML = `内訳: 💴現金 <span class="privacy-mask">${formatCurrency(totalCash)}</span> | 📈投資 <span class="privacy-mask">${formatCurrency(investmentTotal)}</span> | 💳負債 <span class="privacy-mask">-${formatCurrency(totalDebts)}</span>`;
+                document.getElementById('total-cost-display').textContent = `投資元本: ${formatCurrency(investmentCost)} | 評価益: ${investmentProfit >= 0 ? '+' : ''}${formatCurrency(investmentProfit)}`;
+                
+                // TOP3 第1位：配当＋優待の実質総合利回り
+                const totalIncome = annualDiv + annualPerk;
+                document.getElementById('annual-dividend').textContent = formatCurrency(Math.round(totalIncome)) + ' / 年';
+                document.getElementById('monthly-dividend').textContent = '月換算: 約 ' + formatCurrency(Math.round(totalIncome / 12));
+                document.getElementById('perk-breakdown-display').textContent = `🎁 優待換算: ${formatCurrency(annualPerk)}`;
+                
+                const avgTotalYield = investmentCost > 0 ? ((totalIncome / investmentCost) * 100).toFixed(2) : '0.00';
+                document.getElementById('total-income-yield-badge').textContent = `実質総合利回り: ${avgTotalYield}%`;
+                
+                document.getElementById('nisa-total-display').textContent = formatCurrency(nisaTotal);
+                document.getElementById('nisa-progress-text').textContent = `上限1,800万円中 ${((nisaTotal / 18000000) * 100).toFixed(1)}% 消化`;
+
+                renderAssetTable();
+                renderDividendMonthChart();
+                renderHistoryChart();
+                renderPerkTasks();
+                renderHistoryTimeline();
+                updateRegionExposure(items);
+                updateSimulations();
+                updateMilestones(netWorth, totalIncome, nisaTotal);
+                calculateRebalanceNav();
+                updateSideFireSnowball();
+            } catch (err) {
+                console.error("updateAllUI error:", err);
+            }
+        }
+
+        // ==============================================================
+        // 🏅 資産マイルストーン（トロフィールーム）判定
+        // ==============================================================
+        function updateMilestones(netWorth, totalIncome, nisaTotal) {
+            const container = document.getElementById('trophy-grid-container');
+            const countBadge = document.getElementById('trophy-unlocked-count');
+            if (!container) return;
+
+            const monthlyIncome = totalIncome / 12;
+            const nisaPct = (nisaTotal / 18000000) * 100;
+
+            const trophies = [
+                { id: 'w100', title: '純資産100万円突破', cat: '資産規模', reqText: '100万円', current: netWorth, target: 1000000, icon: 'bi-seedling' },
+                { id: 'w300', title: '純資産300万円突破', cat: '資産規模', reqText: '300万円', current: netWorth, target: 3000000, icon: 'bi-coin' },
+                { id: 'w500', title: '純資産500万円突破', cat: '資産規模', reqText: '500万円', current: netWorth, target: 5000000, icon: 'bi-piggy-bank-fill' },
+                { id: 'w1000', title: '純資産1,000万円突破', cat: '大台突破', reqText: '1,000万円', current: netWorth, target: 10000000, icon: 'bi-award-fill' },
+                { id: 'w3000', title: 'アッパーマス層（3,000万）', cat: '準FIRE圏', reqText: '3,000万円', current: netWorth, target: 30000000, icon: 'bi-shield-shaded' },
+                { id: 'w5000', title: '準富裕層（5,000万円）', cat: '資産家', reqText: '5,000万円', current: netWorth, target: 50000000, icon: 'bi-gem' },
+                
+                { id: 'inc1', title: '不労所得 月1万円達成', cat: 'インカム', reqText: '年12万円', current: totalIncome, target: 120000, icon: 'bi-cash-coin' },
+                { id: 'inc3', title: '不労所得 月3万円達成', cat: 'インカム', reqText: '年36万円', current: totalIncome, target: 360000, icon: 'bi-lightning-fill' },
+                { id: 'inc10', title: '不労所得 月10万円達成', cat: 'インカム', reqText: '年120万円', current: totalIncome, target: 1200000, icon: 'bi-stars' },
+
+                { id: 'nisa20', title: '新NISA 20%枠消化', cat: '非課税枠', reqText: '360万円', current: nisaTotal, target: 3600000, icon: 'bi-check-circle-fill' },
+                { id: 'nisa50', title: '新NISA 50%枠消化', cat: '非課税枠', reqText: '900万円', current: nisaTotal, target: 9000000, icon: 'bi-pie-chart-fill' },
+                { id: 'nisa100', title: '新NISA 1,800万完走！', cat: '完全制覇', reqText: '1,800万円', current: nisaTotal, target: 18000000, icon: 'bi-trophy-fill' }
+            ];
+
+            let unlockedCount = 0;
+            container.innerHTML = trophies.map(t => {
+                const isUnlocked = t.current >= t.target;
+                if (isUnlocked) unlockedCount++;
+                const pct = Math.min(100, Math.max(0, (t.current / t.target) * 100)).toFixed(0);
+
+                return `
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="p-2.5 rounded-3 border text-start h-100 transition-all ${isUnlocked ? 'bg-warning bg-opacity-10 border-warning shadow-sm' : 'bg-body-tertiary opacity-60'}">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center ${isUnlocked ? 'bg-warning text-dark' : 'bg-secondary text-white'}" style="width: 28px; height: 28px; font-size: 0.9rem;">
+                                    <i class="bi ${t.icon}"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <span class="d-block fw-bold text-truncate" style="font-size: 0.78rem;">${t.title}</span>
+                                    <small class="text-muted" style="font-size: 0.68rem;">${t.cat} (${t.reqText})</small>
+                                </div>
+                            </div>
+                            <div class="progress mt-1.5" style="height: 5px;">
+                                <div class="progress-bar ${isUnlocked ? 'bg-warning' : 'bg-secondary'}" style="width: ${pct}%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1 text-muted" style="font-size: 0.65rem;">
+                                <span>${isUnlocked ? '<span class="text-warning fw-bold">🎉 達成！</span>' : '進捗'}</span>
+                                <span>${pct}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (countBadge) countBadge.textContent = `${unlockedCount} / ${trophies.length} 解放`;
+        }
+
+        // ==============================================================
+        // ⚖️ 理想ポートフォリオ比率 ＆ 今月の買い増しナビ
+        // ==============================================================
+        function toggleAllocSetting() {
+            const box = document.getElementById('alloc-setting-box');
+            if (box) {
+                box.classList.toggle('hidden');
+                document.getElementById('alloc-target-trust').value = targetAlloc.trust || 60;
+                document.getElementById('alloc-target-stock').value = targetAlloc.stock || 20;
+                document.getElementById('alloc-target-cash').value = targetAlloc.cash || 20;
+            }
+        }
+
+        function saveTargetAllocations() {
+            const t = parseFloat(document.getElementById('alloc-target-trust').value) || 0;
+            const s = parseFloat(document.getElementById('alloc-target-stock').value) || 0;
+            const c = parseFloat(document.getElementById('alloc-target-cash').value) || 0;
+            targetAlloc = { trust: t, stock: s, cash: c };
+            localStorage.setItem('app_target_alloc', JSON.stringify(targetAlloc));
+            document.getElementById('alloc-setting-box').classList.add('hidden');
+            calculateRebalanceNav();
+            saveToCloud();
+            showToast('目標ポートフォリオ比率を保存しました！');
+        }
+
+        function calculateRebalanceNav() {
+            const container = document.getElementById('rebalance-recommendation-box');
+            if (!container) return;
+
+            let curTrust = 0, curStock = 0, curCash = 0;
+            items.forEach(it => {
+                const v = calculateItemTotal(it);
+                if (isTrustCategory(it.category)) curTrust += v;
+                else if (it.category === 'stock') curStock += v;
+                else if (isCash(it)) curCash += v;
+            });
+
+            const curTotal = curTrust + curStock + curCash;
+            if (curTotal <= 0) {
+                container.innerHTML = '<div class="small text-secondary text-center py-2">資産が登録されると買い増し提案が表示されます</div>';
+                return;
+            }
+
+            const pTrust = ((curTrust / curTotal) * 100).toFixed(1);
+            const pStock = ((curStock / curTotal) * 100).toFixed(1);
+            const pCash = ((curCash / curTotal) * 100).toFixed(1);
+
+            const budget = parseFloat(document.getElementById('rebalance-budget-input').value) || 0;
+            const nextTotal = curTotal + budget;
+
+            // 目標金額
+            const targetTrustVal = nextTotal * ((targetAlloc.trust || 60) / 100);
+            const targetStockVal = nextTotal * ((targetAlloc.stock || 20) / 100);
+            const targetCashVal = nextTotal * ((targetAlloc.cash || 20) / 100);
+
+            // 不足額
+            const diffTrust = Math.max(0, targetTrustVal - curTrust);
+            const diffStock = Math.max(0, targetStockVal - curStock);
+            const diffCash = Math.max(0, targetCashVal - curCash);
+            const sumDiff = diffTrust + diffStock + diffCash;
+
+            let addTrust = 0, addStock = 0;
+            if (sumDiff > 0 && budget > 0) {
+                addTrust = Math.round(budget * (diffTrust / sumDiff));
+                addStock = budget - addTrust;
+            }
+
+            container.innerHTML = `
+                <div class="d-flex justify-content-between text-secondary small mb-2">
+                    <span>現在比率: 投信 <strong>${pTrust}%</strong> | 株式 <strong>${pStock}%</strong> | 現金 <strong>${pCash}%</strong></span>
+                    <span>目標: ${targetAlloc.trust || 60}% : ${targetAlloc.stock || 20}% : ${targetAlloc.cash || 20}%</span>
+                </div>
+                <div class="p-2.5 bg-body rounded-3 border">
+                    <strong class="text-primary small d-block mb-1"><i class="bi bi-lightbulb-fill text-warning me-1"></i>今月の最適買い増しプラン:</strong>
+                    <div class="row g-2 text-center">
+                        <div class="col-6">
+                            <div class="p-2 bg-primary bg-opacity-10 rounded border border-primary-subtle">
+                                <span class="small text-secondary d-block">📈 投資信託に:</span>
+                                <h5 class="mb-0 fw-bold text-primary">${formatCurrency(addTrust)}</h5>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 bg-success bg-opacity-10 rounded border border-success-subtle">
+                                <span class="small text-secondary d-block">🏢 株式に:</span>
+                                <h5 class="mb-0 fw-bold text-success">${formatCurrency(addStock)}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==============================================================
+        // 🏖️ サイドFIRE ＆ ⛄ 配当雪だるま自走エンジン
+        // ==============================================================
+        function updateSideFireSnowball() {
+            let curNet = 0, annualDiv = 0, annualPerk = 0;
+            items.forEach(it => {
+                const v = calculateItemTotal(it);
+                if (it.category === 'debt') curNet -= v;
+                else {
+                    curNet += v;
+                    if (getNum(it.dividendYield) > 0) annualDiv += v * (getNum(it.dividendYield) / 100);
+                    if (getNum(it.perkVal) > 0) annualPerk += getNum(it.perkVal);
+                }
+            });
+
+            const expenseMonthly = parseFloat(document.getElementById('sidefire-expense-input')?.value) || 200000;
+            const pensionMonthly = parseFloat(localStorage.getItem('app_pension_amount')) || 150000;
+
+            // 月額不労所得 (資産4%取崩し + 配当 + 優待)
+            const monthlySWR = Math.round((Math.max(0, curNet) * 0.04) / 12);
+            const monthlyPassive = monthlySWR + Math.round((annualDiv + annualPerk) / 12);
+
+            const laborNeeded = Math.max(0, expenseMonthly - monthlyPassive);
+            const coveragePct = expenseMonthly > 0 ? Math.min(100, (monthlyPassive / expenseMonthly) * 100).toFixed(1) : 0;
+
+            const laborEl = document.getElementById('sidefire-needed-labor');
+            const badgeEl = document.getElementById('sidefire-coverage-badge');
+            const descEl = document.getElementById('sidefire-desc');
+
+            if (laborEl) laborEl.textContent = laborNeeded === 0 ? '🎉 月 ¥0（完全自由達成！）' : `月 約 ${formatCurrency(laborNeeded)}`;
+            if (badgeEl) badgeEl.textContent = `不労所得カバー率: ${coveragePct}%`;
+            if (descEl) {
+                descEl.textContent = laborNeeded === 0 
+                    ? '運用資産と配当だけで生活費を完全カバーできています！' 
+                    : `月${formatCurrency(laborNeeded)}のゆるい労働（週2〜3日バイト等）で自由生活が可能！`;
+            }
+
+            // ⛄ 配当雪だるま
+            const snowballEl = document.getElementById('snowball-power-text');
+            if (snowballEl) {
+                // オルカン基準価額の代表値（登録があればその価額、なければ28,000円換算）
+                const orukan = items.find(i => (i.name || '').includes('全世界') || (i.name || '').includes('オルカン'));
+                const nav = (orukan && orukan.price > 0) ? orukan.price : 28000;
+                
+                // 年間配当金で買える口数 = (配当金 / 単価) * 10,000
+                const annualUnits = Math.round((annualDiv / nav) * 10000);
+                const monthlyUnits = Math.round(annualUnits / 12);
+
+                if (annualDiv > 0) {
+                    snowballEl.innerHTML = `年間配当 <strong>${formatCurrency(Math.round(annualDiv))}</strong> で、毎月オルカンを約 <strong class="text-primary fs-5">${monthlyUnits.toLocaleString()}口</strong> 自動買い増し中！`;
+                } else {
+                    snowballEl.innerHTML = `高配当株を登録すると、毎月の配当で自動買い増しできる雪だるま速度がここに表示されます。`;
+                }
+            }
+        }
+
+        function editAsset(id) {
+            const it = items.find(i => String(i.id) === String(id));
+            if (!it) return;
+
+            document.getElementById('asset-id').value = it.id;
+            document.getElementById('asset-category').value = it.category;
+            document.getElementById('asset-name').value = it.name;
+            document.getElementById('asset-nisa').value = it.nisa || 'none';
+            document.getElementById('asset-dividend-yield').value = it.dividendYield || '';
+            document.getElementById('asset-perk-val').value = it.perkVal || '';
+            document.getElementById('asset-perk-desc').value = it.perkDesc || '';
+            document.getElementById('asset-memo-rule').value = it.memoRule || '';
+
+            if (['trust','stock','crypto'].includes(it.category)) {
+                document.getElementById('asset-quantity').value = getItemQuantity(it) || '';
+                document.getElementById('asset-price').value = getItemPrice(it) || '';
+                document.getElementById('asset-cost-price').value = it.costPrice || '';
+            } else {
+                document.getElementById('asset-direct-amount').value = it.directAmount || it.price || '';
+            }
+
+            const mList = it.dividendMonths || [];
+            document.querySelectorAll('.div-month-chk').forEach(chk => {
+                chk.checked = mList.includes(parseInt(chk.value));
+            });
+
+            const pmList = it.perkMonths || [];
+            document.querySelectorAll('.perk-month-chk').forEach(chk => {
+                chk.checked = pmList.includes(parseInt(chk.value));
+            });
+
+            handleCategoryInputFields();
+            updateModalPreview();
+            document.getElementById('assetModalTitle').textContent = '資産の編集';
+            assetModal.show();
+        }
+
+        document.getElementById('assetForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const id = document.getElementById('asset-id').value;
+            const category = document.getElementById('asset-category').value;
+            const name = document.getElementById('asset-name').value;
+            const nisa = document.getElementById('asset-nisa').value;
+            const dividendYield = parseFloat(document.getElementById('asset-dividend-yield').value) || 0;
+            const perkVal = parseFloat(document.getElementById('asset-perk-val').value) || 0;
+            const perkDesc = document.getElementById('asset-perk-desc').value.trim();
+            const memoRule = document.getElementById('asset-memo-rule').value.trim();
+
+            const dividendMonths = [];
+            document.querySelectorAll('.div-month-chk:checked').forEach(c => dividendMonths.push(parseInt(c.value)));
+
+            const perkMonths = [];
+            document.querySelectorAll('.perk-month-chk:checked').forEach(c => perkMonths.push(parseInt(c.value)));
+
+            let quantity = 0, price = 0, costPrice = 0, directAmount = 0;
+            if (['trust','stock','crypto'].includes(category)) {
+                quantity = parseFloat(document.getElementById('asset-quantity').value) || 0;
+                price = parseFloat(document.getElementById('asset-price').value) || 0;
+                costPrice = parseFloat(document.getElementById('asset-cost-price').value) || price;
+            } else {
+                directAmount = parseFloat(document.getElementById('asset-direct-amount').value) || 0;
+                price = directAmount;
+            }
+
+            if (id) {
+                const idx = items.findIndex(i => String(i.id) === String(id));
+                if (idx >= 0) {
+                    items[idx] = { ...items[idx], category, name, nisa, dividendYield, perkVal, perkDesc, memoRule, dividendMonths, perkMonths, quantity, price, costPrice, directAmount };
+                    if (['trust', 'stock'].includes(category) && price > 0) {
+                        const targetName = name.trim().toLowerCase();
+                        items.forEach(it => {
+                            if (String(it.id) !== String(id) && (it.name || '').trim().toLowerCase() === targetName) {
+                                it.price = price;
+                            }
+                        });
+                    }
+                }
+            } else {
+                const existingSameName = items.find(i => (i.name || '').trim().toLowerCase() === name.trim().toLowerCase());
+                const def = existingSameName ? getItemRegions(existingSameName) : getDefaultRegions(name, category);
+
+                items.push({
+                    id: 'local_' + Date.now(),
+                    category, name, nisa, dividendYield, perkVal, perkDesc, memoRule, dividendMonths, perkMonths, quantity, price, costPrice, directAmount,
+                    manualUs: def.us, manualDev: def.dev, manualJp: def.jp, manualEm: def.em
+                });
+            }
+
+            saveLocalData();
+            assetModal.hide();
+            showToast('資産情報を保存しました！');
+        });
+<!-- ... existing code ... -->
