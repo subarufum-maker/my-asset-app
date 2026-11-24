@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
-  <!-- Firebase SDK (Auth含む完全版) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -48,39 +48,32 @@
       margin: 0 auto;
       transition: max-width 0.2s ease;
     }
-    /* タブレット横向き（640px以上のlandscape）およびPCワイド画面で確実に2カラム化 */
-    @media (min-width: 960px), (orientation: landscape) and (min-width: 640px) {
+    /* スマホ横向き（幅600px以上またはlandscape）およびPC・タブレットで2カラム拡張 */
+    @media (min-width: 600px) and (orientation: landscape), (min-width: 900px) {
       .main-container {
         max-width: 1380px;
       }
       .landscape-grid-2col {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
+        gap: 1rem;
         align-items: start;
       }
       .landscape-grid-home {
         display: grid;
         grid-template-columns: 1.05fr 0.95fr;
-        gap: 1.25rem;
+        gap: 1rem;
         align-items: start;
       }
       .landscape-sticky-col {
         position: sticky;
-        top: 68px;
+        top: 62px;
       }
       .asset-list-scroll-landscape {
-        max-height: calc(100vh - 360px);
-        min-height: 240px;
+        max-height: 65vh;
+        min-height: 220px;
         overflow-y: auto;
         padding-right: 4px;
-      }
-      .asset-list-scroll-landscape::-webkit-scrollbar {
-        width: 6px;
-      }
-      .asset-list-scroll-landscape::-webkit-scrollbar-thumb {
-        background: #334155;
-        border-radius: 3px;
       }
       .bottom-nav {
         max-width: 640px;
@@ -98,13 +91,13 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
     }
     .navbar-top {
-      background-color: rgba(15, 23, 42, 0.9);
+      background-color: rgba(15, 23, 42, 0.92);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--card-border);
       position: sticky;
       top: 0;
       z-index: 1020;
-      padding-top: calc(0.5rem + env(safe-area-inset-top));
+      padding-top: calc(0.45rem + env(safe-area-inset-top));
     }
     .navbar-inner {
       max-width: 1380px;
@@ -155,7 +148,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
     .bottom-spacer {
-      height: 90px;
+      height: 85px;
       width: 100%;
     }
     .badge-soft-success { background-color: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -180,7 +173,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
     }
     #app-lock-overlay.locked {
       display: flex;
@@ -197,10 +190,10 @@
       background: #38bdf8;
     }
     .keypad-btn {
-      width: 64px;
-      height: 64px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       font-weight: 700;
       background-color: #1e293b;
       border: 1px solid #334155;
@@ -218,16 +211,16 @@
 </head>
 <body>
 
-  <!-- ==================== 全画面生体認証・PINロック画面（PCキーボード対応） ==================== -->
+  <!-- ==================== 全画面生体認証・PINロック画面 ==================== -->
   <div id="app-lock-overlay">
     <div class="text-center" style="max-width: 340px;">
       <div class="mb-2">
-        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10 border border-info border-opacity-25" style="width: 58px; height: 58px;">
+        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10 border border-info border-opacity-25" style="width: 54px; height: 54px;">
           <i class="bi bi-fingerprint text-info fs-2"></i>
         </span>
       </div>
       <h5 class="fw-bold mb-1">Asset Pro ロック中</h5>
-      <p class="text-secondary small mb-3" id="lock-status-msg">生体認証または4桁PIN（キーボード入力可）で解除</p>
+      <p class="text-secondary small mb-2">生体認証または4桁PIN（キーボード入力可）で解除</p>
 
       <button id="btn-trigger-biometric" type="button" class="btn btn-info text-dark fw-bold w-100 py-2 mb-3" onclick="unlockWithBiometrics()">
         <i class="bi bi-fingerprint me-1"></i>生体認証（指紋・顔）で解除
@@ -241,7 +234,7 @@
       </div>
       <div id="pin-error-text" class="text-danger small mb-2" style="min-height: 20px;"></div>
 
-      <div class="d-grid gap-2 justify-content-center" style="grid-template-columns: repeat(3, 68px);">
+      <div class="d-grid gap-2 justify-content-center" style="grid-template-columns: repeat(3, 64px);">
         <button type="button" class="keypad-btn" onclick="pressPinKey('1')">1</button>
         <button type="button" class="keypad-btn" onclick="pressPinKey('2')">2</button>
         <button type="button" class="keypad-btn" onclick="pressPinKey('3')">3</button>
@@ -274,12 +267,12 @@
         <i class="bi bi-shield-lock-fill text-info fs-5"></i>
         <span class="fw-bold tracking-tight">Asset Pro</span>
         <span id="cloud-status-badge" class="badge bg-secondary" style="font-size: 0.65rem;">未ログイン</span>
+        <span class="badge bg-dark border border-secondary text-secondary" style="font-size: 0.6rem;">v2.6</span>
       </div>
       <div class="d-flex align-items-center gap-2">
         <button type="button" class="btn btn-sm btn-outline-info py-1 px-2 d-flex align-items-center gap-1" onclick="openFxModal()" style="font-size: 0.78rem;">
           <span>🇺🇸</span>
           <span id="nav-usdjpy" class="fw-bold">---.--</span>
-          <span class="text-secondary d-none d-md-inline" style="font-size: 0.7rem;">円</span>
         </button>
         <button id="btn-nav-lock" type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="handleNavLockClick()" title="画面ロック・生体認証設定">
           <i id="nav-lock-icon" class="bi bi-unlock"></i>
@@ -297,6 +290,7 @@
       <div class="small">
         <i class="bi bi-lock-fill text-info me-1"></i>
         <strong>クラウド保護ロック中:</strong> 誤って空データで上書きするのを防ぐため、Googleログイン完了までクラウド書き込みを一時停止しています。
+        <div id="auth-debug-msg" class="text-danger fw-bold mt-1 d-none" style="font-size: 0.75rem;"></div>
       </div>
       <button id="btn-banner-login" type="button" class="btn btn-sm btn-info text-dark fw-bold" onclick="signInWithGoogle()">
         <i class="bi bi-google me-1"></i>Googleで同期解除・ログイン
@@ -306,10 +300,8 @@
 
   <div class="container-fluid px-3 py-3 main-container">
 
-    <!-- ==================== 1. ホームタブ（横画面2カラム対応） ==================== -->
+    <!-- ==================== 1. ホームタブ ==================== -->
     <div id="tab-home" class="tab-pane-custom active">
-      
-      <!-- 今月の配当・優待スマートリマインダー -->
       <div id="this-month-dividend-alert" class="alert alert-warning py-2 px-3 mb-3 d-none border-warning" style="background-color: rgba(245, 158, 11, 0.12); color: #fde68a;">
         <div class="d-flex align-items-center justify-content-between">
           <div class="small">
@@ -321,7 +313,6 @@
       </div>
 
       <div class="landscape-grid-home">
-        <!-- 左カラム：総資産・マイルストーン・新NISA枠 -->
         <div class="landscape-sticky-col">
           <!-- 総資産サマリーカード -->
           <div class="card p-3 mb-3">
@@ -349,7 +340,7 @@
             </div>
           </div>
 
-          <!-- 運用資産マイルストーン＆バッジメーター -->
+          <!-- 運用資産マイルストーン -->
           <div class="card p-3 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-1">
               <div class="fw-bold small"><i class="bi bi-trophy-fill text-warning me-1"></i>運用資産マイルストーン <span class="text-secondary fw-normal" style="font-size: 0.7rem;">(投信・株のみ)</span></div>
@@ -377,7 +368,7 @@
             </div>
           </div>
 
-          <!-- 新NISA 1,800万完走 ＆ 枠内訳カウントダウン -->
+          <!-- 新NISA 生涯非課税枠 -->
           <div class="card p-3 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <div class="fw-bold small"><i class="bi bi-shield-check text-info me-1"></i>新NISA 生涯非課税枠 (1,800万円)</div>
@@ -432,7 +423,6 @@
           </div>
         </div>
 
-        <!-- 右カラム：ポートフォリオ構成チャート ＆ 保有資産一覧 -->
         <div>
           <div class="card p-3 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -459,10 +449,9 @@
       <div class="bottom-spacer"></div>
     </div>
 
-    <!-- ==================== 2. 配当・優待・カレンダータブ（横画面2カラム対応） ==================== -->
+    <!-- ==================== 2. 配当・優待・カレンダータブ ==================== -->
     <div id="tab-dividend" class="tab-pane-custom">
       <div class="landscape-grid-2col">
-        <!-- 左カラム：生活費タダ化メーター -->
         <div>
           <div class="card p-3 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -479,7 +468,6 @@
           </div>
         </div>
 
-        <!-- 右カラム：ステルス配当 ＆ 月別スケジュール -->
         <div>
           <div class="card p-3 mb-3 border-info border-opacity-50" style="background: linear-gradient(145deg, #1e293b 0%, #0f2942 100%);">
             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -530,20 +518,15 @@
             <div style="height: 220px;">
               <canvas id="dividendMonthChart"></canvas>
             </div>
-            <div class="text-secondary mt-2" style="font-size: 0.72rem;">
-              ※配当月と株主優待月を別々に集計して積み上げ表示します。「Googleカレンダー出力」を押すと予定ファイル（.ics）がダウンロードされます。
-            </div>
           </div>
         </div>
       </div>
-
       <div class="bottom-spacer"></div>
     </div>
 
-    <!-- ==================== 3. 戦略・リバランス計算タブ（横画面2カラム対応） ==================== -->
+    <!-- ==================== 3. 戦略・リバランス計算タブ ==================== -->
     <div id="tab-strategy" class="tab-pane-custom">
       <div class="landscape-grid-2col">
-        <!-- 左カラム：貯蓄率メーター -->
         <div>
           <div class="card p-3 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -571,7 +554,6 @@
           </div>
         </div>
 
-        <!-- 右カラム：リバランス買付計算機 -->
         <div>
           <div class="card p-3 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -614,11 +596,10 @@
           </div>
         </div>
       </div>
-
       <div class="bottom-spacer"></div>
     </div>
 
-    <!-- ==================== 4. シミュレータタブ（横画面2カラム対応） ==================== -->
+    <!-- ==================== 4. シミュレータタブ ==================== -->
     <div id="tab-sim" class="tab-pane-custom">
       <div class="landscape-grid-2col">
         <div>
@@ -666,11 +647,10 @@
           </div>
         </div>
       </div>
-
       <div class="bottom-spacer"></div>
     </div>
 
-    <!-- ==================== 5. 実績・履歴タブ（横画面2カラム対応） ==================== -->
+    <!-- ==================== 5. 実績・履歴タブ ==================== -->
     <div id="tab-history" class="tab-pane-custom">
       <div class="landscape-grid-2col">
         <div>
@@ -694,7 +674,6 @@
           </div>
         </div>
       </div>
-
       <div class="bottom-spacer"></div>
     </div>
 
@@ -889,4 +868,472 @@
           <div class="display-5 fw-bold text-info mb-1" id="modal-fx-rate">---.-- 円</div>
           <div class="small text-secondary mb-3" id="modal-fx-updated">更新確認中...</div>
           
-          <div class="p-2 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 small text-start mb
+          <div class="p-2 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 small text-start mb-3">
+            <div><i class="bi bi-bell-fill text-warning me-1"></i><strong>急変動アラート監視中:</strong></div>
+            <div class="text-secondary">直近1時間で <strong>±1.00円以上</strong> の変動を検知すると自動通知します。</div>
+          </div>
+
+          <button type="button" class="btn btn-info text-dark fw-bold w-100 btn-sm" onclick="fetchExchangeRate(true)">
+            <i class="bi bi-arrow-clockwise me-1"></i>今すぐ最新レートを取得
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== モーダル 4: セキュリティ・Googleドライブ自動同期・バックアップ ==================== -->
+  <div class="modal fade" id="backupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content bg-dark text-white border-secondary">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold fs-6">🛡️ セキュリティ・Googleドライブ自動同期</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body small">
+
+          <!-- 生体認証＋PINロック設定ブロック -->
+          <div class="p-2 px-3 rounded bg-secondary bg-opacity-10 border border-info border-opacity-25 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-bold text-info"><i class="bi bi-fingerprint me-1"></i>生体認証（指紋・顔）＋ PINロック</span>
+              <span id="bio-setup-status-badge" class="badge bg-secondary">未設定</span>
+            </div>
+            <p class="text-secondary mb-2" style="font-size: 0.72rem;">
+              起動時やバックグラウンド復帰時（3分経過後）に画面を隠し、生体認証または4桁PIN（PCはキーボード数字キー直接入力可）で解除します。
+            </p>
+
+            <div id="bio-setup-form">
+              <div class="input-group input-group-sm mb-2">
+                <span class="input-group-text bg-dark text-secondary border-secondary">予備4桁PIN</span>
+                <input type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" id="setup-pin-input" class="form-control bg-dark text-white border-secondary" placeholder="例: 1234">
+                <button type="button" class="btn btn-info text-dark fw-bold" onclick="registerBiometricAndPin()">登録して有効化</button>
+              </div>
+            </div>
+
+            <div id="bio-active-actions" class="d-none d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-warning text-dark fw-bold flex-grow-1" onclick="lockAppNow(true)">
+                <i class="bi bi-lock-fill me-1"></i>今すぐ画面ロック
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger" onclick="disableBiometricLock()">
+                解除
+              </button>
+            </div>
+          </div>
+
+          <!-- Googleドライブ＆スプレッドシート自動バックアップ（GAS連携） -->
+          <div class="p-2 px-3 rounded bg-secondary bg-opacity-10 border border-success border-opacity-25 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-bold text-success"><i class="bi bi-file-earmark-spreadsheet me-1"></i>Googleドライブ＆シート自動保存</span>
+              <span id="gas-status-badge" class="badge bg-secondary">未設定</span>
+            </div>
+            <p class="text-secondary mb-2" style="font-size: 0.72rem;">
+              GASウェブアプリURLを登録すると、資産更新や記録のたびにGoogleドライブへJSONとスプレッドシート表が自動保存されます。
+            </p>
+            <div class="input-group input-group-sm mb-2">
+              <input type="url" id="gas-webhook-input" class="form-control bg-dark text-white border-secondary" placeholder="https://script.google.com/macros/s/.../exec">
+              <button type="button" class="btn btn-success fw-bold" onclick="saveGasWebhookUrl()">保存</button>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span id="gas-last-sync-text" class="text-secondary" style="font-size: 0.68rem;">最終送信: なし</span>
+              <button type="button" class="btn btn-xs btn-outline-success py-0 px-2" style="font-size: 0.72rem;" onclick="triggerDriveBackup('手動テスト送信', true)">
+                <i class="bi bi-cloud-upload me-1"></i>今すぐドライブへ送信
+              </button>
+            </div>
+          </div>
+
+          <!-- ログイン中のGoogleアカウント情報 -->
+          <div class="p-2 px-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 mb-3">
+            <div class="fw-bold text-info mb-1"><i class="bi bi-google me-1"></i>Googleアカウント同期状態</div>
+            <div id="modal-user-email" class="text-white">未ログイン</div>
+            <div id="modal-user-uid" class="text-secondary mt-1 mb-2" style="font-size: 0.68rem; word-break: break-all;">UID: ---</div>
+
+            <div id="modal-logout-area" class="d-none">
+              <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="signOutGoogle()">
+                <i class="bi bi-box-arrow-right me-1"></i>Googleアカウントからログアウト
+              </button>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-outline-info fw-bold w-100 btn-sm mb-2" onclick="exportBackupJSON()">
+            <i class="bi bi-download me-1"></i>端末にJSONファイルをダウンロード
+          </button>
+          <label class="form-label text-secondary mt-1 mb-1" style="font-size: 0.72rem;">バックアップファイル (.json) から復元</label>
+          <input type="file" id="import-json-file" class="form-control form-control-sm bg-dark text-white border-secondary" accept=".json" onchange="importBackupJSON(event)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ==================== PWA 動的アイコン＆マニフェスト自動生成 ====================
+    (function setupPWA() {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 512, 512, 112);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+        ctx.lineWidth = 16;
+        ctx.beginPath();
+        ctx.roundRect(24, 24, 464, 464, 96);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 36;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(110, 350);
+        ctx.lineTo(205, 265);
+        ctx.lineTo(275, 305);
+        ctx.lineTo(395, 165);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(330, 165);
+        ctx.lineTo(395, 165);
+        ctx.lineTo(395, 230);
+        ctx.stroke();
+
+        ctx.fillStyle = '#38bdf8';
+        [[110, 350], [205, 265], [275, 305]].forEach(([x, y]) => {
+          ctx.beginPath();
+          ctx.arc(x, y, 20, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        const pngDataUrl = canvas.toDataURL('image/png');
+        const appleIcon = document.getElementById('pwa-apple-icon');
+        if (appleIcon) appleIcon.href = pngDataUrl;
+
+        const manifestObj = {
+          name: "Asset Pro - 資産管理ダッシュボード",
+          short_name: "Asset Pro",
+          start_url: window.location.href,
+          display: "standalone",
+          background_color: "#0f172a",
+          theme_color: "#0f172a",
+          orientation: "any",
+          icons: [
+            { src: pngDataUrl, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+            { src: pngDataUrl, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+          ]
+        };
+
+        const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const manifestLink = document.getElementById('pwa-manifest');
+        if (manifestLink) manifestLink.href = manifestUrl;
+      } catch (e) {
+        console.warn("PWA setup skipped:", e);
+      }
+    })();
+
+    // ==================== 生体認証（WebAuthn）＆ 4桁PIN ロック機構（PCキーボード対応） ====================
+    let lockConfig = JSON.parse(localStorage.getItem('ap_lock_config') || 'null');
+    let currentPinBuffer = '';
+    let hiddenTimestamp = 0;
+
+    function strToBuf(str) {
+      return new TextEncoder().encode(str);
+    }
+    function bufToBase64(buf) {
+      return btoa(String.fromCharCode(...new Uint8Array(buf)));
+    }
+    function base64ToBuf(b64) {
+      const bin = atob(b64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      return arr.buffer;
+    }
+
+    async function hashPin(pin) {
+      const digest = await crypto.subtle.digest('SHA-256', strToBuf('ap_salt_' + pin));
+      return bufToBase64(digest);
+    }
+
+    function updateLockSettingsUI() {
+      const badge = document.getElementById('bio-setup-status-badge');
+      const setupForm = document.getElementById('bio-setup-form');
+      const activeActions = document.getElementById('bio-active-actions');
+      const navIcon = document.getElementById('nav-lock-icon');
+      const navBtn = document.getElementById('btn-nav-lock');
+
+      if (lockConfig && lockConfig.enabled) {
+        badge.textContent = lockConfig.credId ? '生体認証＋PIN有効' : 'PINロック有効';
+        badge.className = 'badge badge-soft-success';
+        setupForm.classList.add('d-none');
+        activeActions.classList.remove('d-none');
+        navIcon.className = 'bi bi-lock-fill text-success';
+        navBtn.className = 'btn btn-sm btn-outline-success py-1 px-2';
+      } else {
+        badge.textContent = '未設定';
+        badge.className = 'badge bg-secondary';
+        setupForm.classList.remove('d-none');
+        activeActions.classList.add('d-none');
+        navIcon.className = 'bi bi-unlock';
+        navBtn.className = 'btn btn-sm btn-outline-secondary py-1 px-2';
+      }
+    }
+
+    function handleNavLockClick() {
+      if (lockConfig && lockConfig.enabled) {
+        lockAppNow(true);
+      } else {
+        openBackupModal();
+      }
+    }
+
+    async function registerBiometricAndPin() {
+      const pin = document.getElementById('setup-pin-input').value.trim();
+      if (!/^\d{4}$/.test(pin)) {
+        alert('4桁の数字（PIN）を入力してください。');
+        return;
+      }
+
+      const pinHash = await hashPin(pin);
+      let credId = null;
+
+      if (window.PublicKeyCredential && navigator.credentials) {
+        try {
+          const challenge = crypto.getRandomValues(new Uint8Array(32));
+          const userId = crypto.getRandomValues(new Uint8Array(16));
+          const cred = await navigator.credentials.create({
+            publicKey: {
+              challenge,
+              rp: { name: "Asset Pro Dashboard" },
+              user: {
+                id: userId,
+                name: "owner@assetpro.local",
+                displayName: "Asset Pro Owner"
+              },
+              pubKeyCredParams: [
+                { type: "public-key", alg: -7 },
+                { type: "public-key", alg: -257 }
+              ],
+              authenticatorSelection: {
+                authenticatorAttachment: "platform",
+                userVerification: "required"
+              },
+              timeout: 60000
+            }
+          });
+          if (cred && cred.rawId) {
+            credId = bufToBase64(cred.rawId);
+          }
+        } catch (err) {
+          console.warn("WebAuthn registration skipped:", err);
+        }
+      }
+
+      lockConfig = {
+        enabled: true,
+        pinHash,
+        credId
+      };
+      localStorage.setItem('ap_lock_config', JSON.stringify(lockConfig));
+      document.getElementById('setup-pin-input').value = '';
+      updateLockSettingsUI();
+
+      if (credId) {
+        alert('生体認証（指紋・顔）＋ 4桁PINロックを有効化しました！');
+      } else {
+        alert('4桁PINロックを有効化しました！（PCキーボードからも直接入力できます）');
+      }
+    }
+
+    function disableBiometricLock() {
+      if (!confirm('画面ロック機能を解除しますか？')) return;
+      lockConfig = null;
+      localStorage.removeItem('ap_lock_config');
+      updateLockSettingsUI();
+    }
+
+    function lockAppNow(closeModal = false) {
+      if (!lockConfig || !lockConfig.enabled) return;
+      if (closeModal) {
+        const bm = bootstrap.Modal.getInstance(document.getElementById('backupModal'));
+        if (bm) bm.hide();
+      }
+      currentPinBuffer = '';
+      renderPinDots();
+      document.getElementById('pin-error-text').textContent = '';
+
+      const bioBtn = document.getElementById('btn-trigger-biometric');
+      if (lockConfig.credId) {
+        bioBtn.classList.remove('d-none');
+      } else {
+        bioBtn.classList.add('d-none');
+      }
+
+      document.getElementById('app-lock-overlay').classList.add('locked');
+
+      if (lockConfig.credId) {
+        setTimeout(() => unlockWithBiometrics(), 250);
+      }
+    }
+
+    function unlockAppSuccess() {
+      currentPinBuffer = '';
+      renderPinDots();
+      document.getElementById('app-lock-overlay').classList.remove('locked');
+    }
+
+    async function unlockWithBiometrics() {
+      if (!lockConfig || !lockConfig.credId) return;
+      try {
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge,
+            allowCredentials: [{
+              type: "public-key",
+              id: base64ToBuf(lockConfig.credId)
+            }],
+            userVerification: "required",
+            timeout: 60000
+          }
+        });
+        if (assertion) {
+          unlockAppSuccess();
+        }
+      } catch (err) {
+        document.getElementById('pin-error-text').textContent = '生体認証がキャンセルされました。PINで解除できます。';
+      }
+    }
+
+    function renderPinDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`pin-dot-${i}`);
+        if (dot) {
+          if (i < currentPinBuffer.length) dot.classList.add('filled');
+          else dot.classList.remove('filled');
+        }
+      }
+    }
+
+    async function pressPinKey(digit) {
+      if (currentPinBuffer.length >= 4) return;
+      currentPinBuffer += digit;
+      renderPinDots();
+      document.getElementById('pin-error-text').textContent = '';
+
+      if (currentPinBuffer.length === 4 && lockConfig) {
+        const enteredHash = await hashPin(currentPinBuffer);
+        if (enteredHash === lockConfig.pinHash) {
+          unlockAppSuccess();
+        } else {
+          document.getElementById('pin-error-text').textContent = 'PINコードが一致しません';
+          setTimeout(() => {
+            currentPinBuffer = '';
+            renderPinDots();
+          }, 300);
+        }
+      }
+    }
+
+    function backspacePinKey() {
+      currentPinBuffer = currentPinBuffer.slice(0, -1);
+      renderPinDots();
+    }
+
+    function clearPinInput() {
+      currentPinBuffer = '';
+      renderPinDots();
+      document.getElementById('pin-error-text').textContent = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      const overlay = document.getElementById('app-lock-overlay');
+      if (!overlay || !overlay.classList.contains('locked')) return;
+
+      if (/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        pressPinKey(e.key);
+      } else if (e.key === 'Backspace' || e.key === 'Delete') {
+        e.preventDefault();
+        backspacePinKey();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        clearPinInput();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        hiddenTimestamp = Date.now();
+      } else if (hiddenTimestamp > 0 && lockConfig && lockConfig.enabled) {
+        const elapsed = Date.now() - hiddenTimestamp;
+        if (elapsed >= 3 * 60 * 1000) {
+          lockAppNow(false);
+        }
+      }
+    });
+
+    // ==================== Firebase 完全設定（エラー可視化＆ポップアップ優先＋リダイレクトフォールバック） ====================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCjW4UC0Q-3pPUi8LK3ZHPBzfxrI6wgHrc",
+      authDomain: "portfolio-bafd5.firebaseapp.com",
+      databaseURL: "https://portfolio-bafd5-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "portfolio-bafd5",
+      storageBucket: "portfolio-bafd5.firebasestorage.app",
+      messagingSenderId: "165322371706",
+      appId: "1:165322371706:web:0857d194950b73ba6741c3",
+      measurementId: "G-86YRQKQWJ5"
+    };
+
+    let db = null;
+    let auth = null;
+    let currentUser = null;
+    let hasInitialCloudLoadCompleted = false;
+
+    function showAuthDebugError(msg) {
+      const el = document.getElementById('auth-debug-msg');
+      if (el) {
+        el.textContent = "認証エラー詳細: " + msg;
+        el.classList.remove('d-none');
+      }
+      resetLoginButtons();
+    }
+
+    function resetLoginButtons() {
+      const navBtn = document.getElementById('btn-google-auth');
+      const bannerBtn = document.getElementById('btn-banner-login');
+      if (navBtn && !currentUser) navBtn.innerHTML = `<i class="bi bi-google me-1"></i>ログイン`;
+      if (bannerBtn && !currentUser) bannerBtn.innerHTML = `<i class="bi bi-google me-1"></i>Googleで同期解除・ログイン`;
+    }
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.database();
+
+      auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+      auth.getRedirectResult().then((result) => {
+        if (result && result.user) {
+          console.log("Redirect login success:", result.user.email);
+        }
+      }).catch((err) => {
+        if (err && err.message) {
+          showAuthDebugError(`${err.code || ''} - ${err.message}`);
+        }
+      });
+
+      auth.onAuthStateChanged((user) => {
+        if (user && !user.isAnonymous) {
+          currentUser = user;
+          hasInitialCloudLoadCompleted = false;
+          updateCloudStatus("読込中...", "bg-info text-dark");
+          document.getElementById('auth-lock-banner').classList.add('d-none');
+          document.getElementById('auth-debug-msg').classList.add('d-none');
+          document.getElementById('btn-google-auth').innerHTML = `<i class="bi bi-check-circle-fill text-success me-1"></i>設定`;
+          document.getElementById('btn-google-auth').className = "btn btn-sm btn-outline-success py-1 px-2 fw-bold";
+          document.getElementById('modal-user-email').textContent = user.email || "Googleアカウント認証済";
+          document.
